@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # auteur : Maïeul ROUQUETTE
 # Licence http://creativecommons.org/licenses/by-sa/2.0/fr/
-# version 2.2 pour Splitindex : on laisse faire le makeindex à la main
+# version 2.3 pour Splitindex : on laisse faire le makeindex à la main
 
 
 modification 	= 'principal.idx'		# A vous de modifier ici
@@ -11,7 +11,24 @@ splitindex		= 'sources'			# Le nom de l'index à concacéténer d'après splitin
 #definition des fonctions
 
 import re
+def trier(chaine):
+	chaine = supprimer_accent(chaine)
+	chaine = supprimer_tiret_nombre(chaine)
+	return chaine
 
+def supprimer_tiret_nombre(chaine):
+	tiret = chaine.find('-')
+	if tiret > -1:
+		avant_tiret = chaine[0:tiret]
+	else:
+		return chaine
+	try:
+		#voir si c'est un entier
+		avant_tiret = int(avant_tiret)
+		return str(avant_tiret)
+	except:
+		return chaine
+	
 def supprimer_accent(chaine):
 	'''http://www.peterbe.com/plog/unicode-to-ascii'''
 	import unicodedata
@@ -64,9 +81,9 @@ def concatener_entree(entre, split):
 		texte = ligne[lg:ligne.rfind('}{')]
 		arobase = texte.find('@')
 		if arobase != -1:				# S'il y a un @
-			infos.append(supprimer_accent(texte[:arobase-1])+texte[arobase-1:])
+			infos.append(trier(texte[:arobase])+texte[arobase:])
 		else:
-			infos.append(supprimer_accent(texte)+'@'+texte)
+			infos.append(trier(texte)+'@'+texte)
 	sorti = sorti + '!'.join(infos)
 	sorti = sorti + ligne[ligne.rfind('}{'):]
 	return sorti
