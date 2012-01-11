@@ -6,28 +6,89 @@
 
 
 modification 	= 'principal.idx'		# A vous de modifier ici
-splitindex		= 'sources'			# Le nom de l'index à concacéténer d'après splitindex	
-
+splitindex		= 'sources'				# Le nom de l'index à concacéténer d'après splitindex	
+seps				= ('&','-',',',';')		# ce qui peut séparer des nombres. Par exemple XX, 2
+sepreference	= ('-','&')				# Ce qui peut séparer des références. Par exemple XX-XXI
 #definition des fonctions
 
-import re
+from roman import fromRoman
 def trier(chaine):
 	chaine = supprimer_accent(chaine)
-	chaine = supprimer_tiret_nombre(chaine)
+	chaine = traiter_nombres(chaine)
 	return chaine
 
-def supprimer_tiret_nombre(chaine):
-	tiret = chaine.find('-')
-	if tiret > -1:
-		avant_tiret = chaine[0:tiret]
-	else:
-		return chaine
-	try:
-		#voir si c'est un entier
-		avant_tiret = int(avant_tiret)
-		return str(avant_tiret)
-	except:
-		return chaine
+def traiter_nombres(chaine):
+	chaine = chaine.replace(' ','')
+	global seps
+	i = -1
+	sep = 0 # position du separateur
+
+	#1. convertir le nombre romain en entier
+	for c in chaine: #parcourir la chaine
+		i = i + 1
+		if c in seps:
+			morceau = chaine[sep:i].upper() 		#le morceau à traiter
+			try:
+				chaine = chaine[:sep] + str(fromRoman(morceau)) + chaine[i:]
+			except:
+				pass
+			sep = i+1
+		if sep == 0:
+			try:
+				chaine = str(fromRoman(chaine))
+			except:
+				pass 
+		
+	chaine = supprimer_sep_nombre(chaine)
+	return chaine	
+
+def ajouter_zeros(nombre):
+	'''Ajout de zero devant un nombre'''
+	return '0' * (30 - len(nombre)) + nombre 
+
+def couper_chaine_nb_morceaux(chaine):
+	# découpage de de la chaine, en morceau morceau
+	global seps
+	sep = 0
+	i 	= -1
+	morceaux = []
+	for c in chaine:
+		i = i +1
+		if c in seps:
+			morceaux.append(chaine[sep:i])
+			morceaux.append(c)
+			sep = i+1
+		
+	
+	morceaux.append(chaine[sep:i+1])
+	return morceaux	
+
+def supprimer_sep_nombre(chaine):
+	global sepreference
+	for i in sepreference:
+		sep = chaine.find(i)
+		if sep > -1:
+			break
+		
+	if sep == -1:
+		try:
+			int(chaine)
+			return ajouter_zeros(chaine)
+		except:
+			return chaine
+	morceaux = couper_chaine_nb_morceaux(chaine[0:sep])
+	for i in range(len(morceaux)):
+		#parcourir les morceaux
+		if i%2 == 0: #dans le cas où on a affaire à un morceau
+			try: 
+				int(morceaux[i])
+				morceaux[i] = ajouter_zeros(morceaux[i])
+			except:
+				# dès qu'un morceau n'est pas numérique, on renvoie la chaine brut
+				return chaine
+	chaine = ''.join(morceaux)
+	return chaine
+	
 	
 def supprimer_accent(chaine):
 	'''http://www.peterbe.com/plog/unicode-to-ascii'''
@@ -91,4 +152,15 @@ def concatener_entree(entre, split):
 		
 
 convertir(modification,splitindex)
-		
+def test():
+	''' Système de test'''
+	test_traiter_nombres = (('',''),
+				('X',ajouter_zeros('10')),
+				('XX-XX',ajouter_zeros('20')),
+				('XX,1-XX',ajouter_zeros('20')+','+ ajouter_zeros('1')),
+				('XX,x,11-XX',ajouter_zeros('20')+',' + ajouter_zeros('10') + ',' + ajouter_zeros('11')))	
+	for i in test_traiter_nombres:
+		if traiter_nombres(i[0]) !=i[1]:
+			print 'erreur sur ' + i[0] + ' devrait être ' + i[1] + ' est ' + traiter_nombres(i[0])
+	
+#test()
