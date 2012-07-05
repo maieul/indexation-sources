@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # auteur : Maïeul ROUQUETTE
 # Licence http://creativecommons.org/licenses/by-sa/2.0/fr/
-# version 2.3 pour Splitindex : on laisse faire le makeindex à la main
+# version 2.4 pour Splitindex : on laisse faire le makeindex à la main
 
 
 modification 	= 'principal.idx'		# A vous de modifier ici
@@ -134,7 +134,7 @@ def concatener_entree(entre, split):
 	if split :
 		sorti = '\indexentry['+split+']{'
 	else :
-		sorti = '\'indexentry{'
+		sorti = '\indexentry{'
 	
 	lg	  = len(sorti)
 	infos = []
