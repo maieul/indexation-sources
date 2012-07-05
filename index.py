@@ -6,7 +6,7 @@
 
 
 modification 	= 'principal.idx'		# A vous de modifier ici
-splitindex		= 'sources'				# Le nom de l'index à concacéténer d'après splitindex	
+splitindex		= False			# Le nom de l'index à concacéténer d'après splitindex, si false, ca veut dire que l'index est dans un fichier spécifique
 seps				= ('&','-',',',';')		# ce qui peut séparer des nombres. Par exemple XX, 2
 sepreference	= ('-','&')				# Ce qui peut séparer des références. Par exemple XX-XXI
 #definition des fonctions
