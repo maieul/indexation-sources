@@ -1,0 +1,36 @@
+\documentclass{book}
+\usepackage{fontspec}
+\usepackage{xunicode}
+\usepackage{polyglossia}
+\setmainlanguage{french}
+\usepackage{imakeidx}
+\usepackage[backend=biber,indexing=true,bibstyle=verbose,citestyle=verbose-trad2,singletitle=true,mincrossrefs=0,citepages=omit,citereset=chapter,useprefix=true]{biblatex}
+\bibliography{biblio}
+\makeindex[title=Index principal]
+\makeindex[name=sources, title=Index des noms propres,noautomatic] 
+
+\renewbibmacro{citeindex}{%
+  \ifciteindex{%
+    \indexnames[sources]{author}%
+     \indexfield[sources]{indextitle}%
+     \indexfield[sources]{titleaddon}%
+     \index[sources]{---}%
+     }%
+    {}}
+
+\DeclareIndexNameFormat{sources}{%
+  \usebibmacro{index:name}{\index[sources]}{#1}{#3}{#5}{#7}
+  }
+\DeclareIndexFieldFormat{sources}{%
+  \ifcurrentfield{indextitle}{\index[sources]{#1@\emph{#1}}}%
+  {\index[sources]{#1}}%
+  }
+\begin{document}
+\cite{PsAugustin1288.2}
+
+\newpage
+
+\cite{DeDoctChrIIviii12-13}
+
+\printindex[sources]
+\end{document}
